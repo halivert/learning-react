@@ -26,17 +26,14 @@ class Board extends React.Component {
 
 	render() {
 		const winnerPositions = this.props.winnerPositions;
-		let rowNumber = 3,
-			colNumber = 3;
 
 		let squares = [];
-		for (let i = 0; i < rowNumber; i++) {
+		for (let i = 0; i < 3; i++) {
 			let row = [];
-			for (let j = 0; j < colNumber; j++) {
-				let win =
-					winnerPositions && winnerPositions.includes(i * colNumber + j);
+			for (let j = 0; j < 3; j++) {
+				let win = winnerPositions && winnerPositions.includes(i * 3 + j);
 
-				row[j] = this.renderSquare(i * colNumber + j, win);
+				row[j] = this.renderSquare(i * 3 + j, win);
 			}
 			squares.push(
 				<div key={i} className="board-row">
@@ -105,6 +102,20 @@ class Game extends React.Component {
 		});
 	}
 
+	restartGame() {
+		this.setState({
+			history: [
+				{
+					squares: Array(9).fill(null),
+					position: { row: 0, col: 0 },
+				},
+			],
+			stepNumber: 0,
+			xIsNext: true,
+			movesAscendent: true,
+		});
+	}
+
 	render() {
 		const history = this.state.history;
 		const current = history[this.state.stepNumber];
@@ -127,13 +138,25 @@ class Game extends React.Component {
 			);
 		});
 
-		const status = winner
-			? `Winner: ${winner}`
-			: `Next player: ${this.state.xIsNext ? "X" : "O"}`;
+		let status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
+		if (winner) {
+			status = `Winner: ${winner}`;
+		} else if (this.state.stepNumber === 9 && moves.length === 10) {
+			status = "It's a draw 💪🏽";
+		}
 
 		const revertLabel = (
 			<button className="button" onClick={() => this.revertMoves()}>
 				{this.state.movesAscendent ? "Sort moves desc" : "Sort moves asc"}
+			</button>
+		);
+
+		const restartButton = (
+			<button
+				className="button restart-button"
+				onClick={() => this.restartGame()}
+			>
+				Restart game
 			</button>
 		);
 
@@ -152,6 +175,7 @@ class Game extends React.Component {
 				</div>
 				<div className="game-info">
 					<div className="status-label">{status}</div>
+					<div>{restartButton}</div>
 					<div>{revertLabel}</div>
 				</div>
 				<div className="game-moves">

@@ -81,3 +81,9 @@ ol button.is-active,
 	font-size: 1.1rem;
 	margin-bottom: 0.75rem;
 }
+
+.restart-button {
+	background: firebrick;
+	color: white;
+	margin-bottom: 0.25rem;
+}
