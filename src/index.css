@@ -49,3 +49,22 @@ ul {
 .game-info {
 	margin-left: 20px;
 }
+
+ol > li:not(:last-of-type) > button {
+	margin-bottom: 0.5rem;
+}
+
+ol button {
+	background: white;
+	color: black;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	text-decoration: none;
+	border: 1px solid black;
+}
+
+ol button.is-active {
+	background: rebeccapurple;
+	color: white;
+	border-color: transparent;
+}
