@@ -50,6 +50,16 @@ ul {
 	flex-direction: row;
 }
 
+@media (max-width: 600px) {
+	.game {
+		flex-flow: row wrap;
+	}
+
+	.game > :not(:last-child) {
+		margin-bottom: 1em;
+	}
+}
+
 .game-info,
 .game-moves {
 	margin-left: 20px;
