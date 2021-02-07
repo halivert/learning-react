@@ -3,25 +3,29 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 function Square(props) {
+	const className = props.winner ? "square winner" : "square";
+
 	return (
-		<button className="square" onClick={props.onClick}>
+		<button className={className} onClick={props.onClick}>
 			{props.value}
 		</button>
 	);
 }
 
 class Board extends React.Component {
-	renderSquare(i) {
+	renderSquare(i, winner) {
 		return (
 			<Square
 				key={i}
 				value={this.props.squares[i]}
 				onClick={() => this.props.onClick(i)}
+				winner={winner}
 			/>
 		);
 	}
 
 	render() {
+		const winnerPositions = this.props.winnerPositions;
 		let rowNumber = 3,
 			colNumber = 3;
 
@@ -29,7 +33,10 @@ class Board extends React.Component {
 		for (let i = 0; i < rowNumber; i++) {
 			let row = [];
 			for (let j = 0; j < colNumber; j++) {
-				row[j] = this.renderSquare(i * colNumber + j);
+				let win =
+					winnerPositions && winnerPositions.includes(i * colNumber + j);
+
+				row[j] = this.renderSquare(i * colNumber + j, win);
 			}
 			squares.push(
 				<div key={i} className="board-row">
@@ -54,7 +61,7 @@ class Game extends React.Component {
 			],
 			stepNumber: 0,
 			xIsNext: true,
-			movesAsc: true,
+			movesAscendent: true,
 		};
 	}
 
@@ -67,8 +74,8 @@ class Game extends React.Component {
 			return;
 		}
 
-		const movesAsc = this.state.movesAsc;
 		squares[i] = this.state.xIsNext ? "X" : "O";
+
 		this.setState({
 			history: history.concat([
 				{
@@ -81,7 +88,7 @@ class Game extends React.Component {
 			]),
 			stepNumber: history.length,
 			xIsNext: !this.state.xIsNext,
-			movesAsc: movesAsc,
+			movesAscendent: this.state.movesAscendent,
 		});
 	}
 
@@ -92,10 +99,18 @@ class Game extends React.Component {
 		});
 	}
 
+	revertMoves() {
+		this.setState({
+			movesAscendent: !this.state.movesAscendent,
+		});
+	}
+
 	render() {
 		const history = this.state.history;
 		const current = history[this.state.stepNumber];
-		const winner = calculateWinner(current.squares);
+		const winnerPositions = calculateWinner(current.squares);
+
+		const winner = winnerPositions ? current.squares[winnerPositions[0]] : null;
 
 		let moves = history.map((step, move) => {
 			const pos = move ? `(${step.position.col}, ${step.position.row})` : "";
@@ -112,23 +127,19 @@ class Game extends React.Component {
 			);
 		});
 
-		if (!this.state.movesAsc) moves = moves.reverse();
+		const status = winner
+			? `Winner: ${winner}`
+			: `Next player: ${this.state.xIsNext ? "X" : "O"}`;
 
-		let status;
-		if (winner) {
-			status = `Winner: ${winner}`;
-		} else {
-			status = `Next player: ${this.state.xIsNext ? "X" : "O"}`;
-		}
-
-		const revertMoves = (
-			<button
-				className="button"
-				onClick={() => (this.state.movesAsc = !this.state.movesAsc)}
-			>
-				{this.state.movesAsc ? "Sort moves desc" : "Sort moves asc"}
+		const revertLabel = (
+			<button className="button" onClick={() => this.revertMoves()}>
+				{this.state.movesAscendent ? "Sort moves desc" : "Sort moves asc"}
 			</button>
 		);
+
+		if (!this.state.movesAscendent) {
+			moves = moves.reverse();
+		}
 
 		return (
 			<div className="game">
@@ -136,11 +147,14 @@ class Game extends React.Component {
 					<Board
 						squares={current.squares}
 						onClick={(i) => this.handleClick(i)}
+						winnerPositions={winnerPositions}
 					/>
 				</div>
 				<div className="game-info">
-					<div>{status}</div>
-					<div>{revertMoves}</div>
+					<div className="status-label">{status}</div>
+					<div>{revertLabel}</div>
+				</div>
+				<div className="game-moves">
 					<ol>{moves}</ol>
 				</div>
 			</div>
@@ -163,7 +177,7 @@ function calculateWinner(squares) {
 	for (let i = 0; i < lines.length; i++) {
 		const [a, b, c] = lines[i];
 		if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-			return squares[a];
+			return lines[i];
 		}
 	}
 

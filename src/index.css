@@ -41,20 +41,27 @@ ul {
 	background: #ddd;
 }
 
+.square.winner {
+	background: rgba(0, 129, 108, 0.2);
+}
+
 .game {
 	display: flex;
 	flex-direction: row;
 }
 
-.game-info {
+.game-info,
+.game-moves {
 	margin-left: 20px;
+	width: 20ch;
 }
 
 ol > li:not(:last-of-type) > button {
 	margin-bottom: 0.5rem;
 }
 
-ol button {
+ol button,
+.button {
 	background: white;
 	color: black;
 	padding: 0.25rem 0.5rem;
@@ -63,8 +70,14 @@ ol button {
 	border: 1px solid black;
 }
 
-ol button.is-active {
+ol button.is-active,
+.button.is-active {
 	background: rebeccapurple;
 	color: white;
 	border-color: transparent;
+}
+
+.status-label {
+	font-size: 1.1rem;
+	margin-bottom: 0.75rem;
 }
